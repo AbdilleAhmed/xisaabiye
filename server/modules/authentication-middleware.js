@@ -11,19 +11,25 @@ const rejectUnauthenticated = (req, res, next) => {
   }
 };
 
-// Example of custom middleware: feel free to modify
-// const rejectIfNotAdmin = (req, res, next) => {
-//   if (req.isAuthenticated() && req.user?.admin) {
-//     // Check to see if the user is authenticated AND an admin
-//     // (based on the existance of an `admin` column in the database)
-//     next();
-//   } else {
-//     res.sendStatus(403);
-//   }
-// };
+
+
+
+// middleware to check if user is an admin 
+const rejectIfNotAdmin = (req, res, next) => {
+  if (req.isAuthenticated() && req.user && req.user.role === "admin") {
+    console.log(`Access granted: ${req.user.username} is admin`);
+    next();
+  } else {
+    console.log("Access denied: Admins only or user not authenticated");
+    res.sendStatus(403);
+  }
+};
+
 
 
 module.exports = { 
   rejectUnauthenticated,
+  rejectIfNotAdmin
+
   // rejectIfNotAdmin
 };

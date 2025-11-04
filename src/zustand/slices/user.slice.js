@@ -12,7 +12,7 @@ const createUserSlice = (set, get) => ({
   fetchUser: async () => {
     //  Retrieves the current user's data from the /api/user endpoint.
     try {
-      const { data } = await axios.get('/api/user');
+      const { data } = await axios.get('/api/users');
       set({ user: data });
     } catch (err) {
       console.log('fetchUser error:', err);
@@ -24,7 +24,7 @@ const createUserSlice = (set, get) => ({
     // /api/user/register, and then attempts to log them in.
     get().setAuthErrorMessage('');
     try {
-      await axios.post('/api/user/register', newUserCredentials);
+      await axios.post('/api/users/register', newUserCredentials);
       get().logIn(newUserCredentials);
     } catch (err) {
       console.log('register error:', err);
@@ -36,7 +36,7 @@ const createUserSlice = (set, get) => ({
     // to /api/user/login and then retrieves their data.
     get().setAuthErrorMessage('')
     try {
-      await axios.post('/api/user/login', userCredentials);
+      await axios.post('/api/users/login', userCredentials);
       get().fetchUser();
     } catch (err) {
       console.log('logIn error:', err);
@@ -54,7 +54,7 @@ const createUserSlice = (set, get) => ({
     // Logs out the current user by sending a DELETE request to
     // /api/user/logout, and then clears their data.
     try {
-      await axios.delete('/api/user/logout');
+      await axios.delete('/api/users/logout');
       set({user : {}});
     } catch (err) {
       console.log('logOut error:', err);

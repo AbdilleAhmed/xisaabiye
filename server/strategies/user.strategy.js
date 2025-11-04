@@ -20,7 +20,7 @@ passport.serializeUser((user, done) => {
 //   * https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
 passport.deserializeUser((id, done) => {
   const sqlText = `
-    SELECT * FROM "user"
+    SELECT * FROM "users"
       WHERE "id" = $1;
   `;
   const sqlValues = [id];
@@ -53,7 +53,7 @@ passport.use(
   'local',
   new LocalStrategy((username, password, done) => {
     const sqlText = `
-      SELECT * FROM "user"
+      SELECT * FROM "users"
         WHERE username = $1;
     `;
     const sqlValues = [username];

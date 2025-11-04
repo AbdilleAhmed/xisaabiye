@@ -14,9 +14,9 @@ function Nav() {
             <li>
               <NavLink to="/login">Login</NavLink>
             </li>
-            <li>
+            {/* <li>
               <NavLink to="/registration">Register</NavLink>
-            </li>
+            </li> */}
           </>
         )
       }
@@ -26,6 +26,11 @@ function Nav() {
             <li>
               <NavLink to="/">Home</NavLink>
             </li>
+              {user.role === 'admin' && (
+              <li>
+                <NavLink to="/register">Register</NavLink>
+              </li>
+            )}
           </>
         )
       }

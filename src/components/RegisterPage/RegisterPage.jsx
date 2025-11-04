@@ -27,33 +27,42 @@ function RegisterPage() {
 
   return (
     <>
-      <h2>Register Page</h2>
-      <form onSubmit={handleRegister}>
-        <label htmlFor="username">Username:</label>
-        <input
-          type="text"
-          id="username"
-          required
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">
-          Register 
-        </button>
-      </form>
-      { // Conditionally render registration error:
-        errorMessage && (
-          <h3>{errorMessage}</h3>
-        )
-      }
+      <h2 className="text-center mt-4 mb-3">Register Page</h2>
+
+<form onSubmit={handleRegister} className="container p-4 border rounded shadow-sm" style={{ maxWidth: '400px' }}>
+  <div className="mb-3">
+    <label htmlFor="username" className="form-label">Username:</label>
+    <input
+      type="text"
+      id="username"
+      className="form-control"
+      required
+      value={username}
+      onChange={(e) => setUsername(e.target.value)}
+    />
+  </div>
+
+  <div className="mb-3">
+    <label htmlFor="password" className="form-label">Password:</label>
+    <input
+      type="password"
+      id="password"
+      className="form-control"
+      required
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+  </div>
+
+  <button type="submit" className="btn btn-primary w-100">
+    Register
+  </button>
+</form>
+
+{errorMessage && (
+  <h5 className="text-danger text-center mt-3">{errorMessage}</h5>
+)}
+
     </>
   );
 }
