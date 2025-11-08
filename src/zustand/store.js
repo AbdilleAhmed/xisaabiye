@@ -1,11 +1,17 @@
-import { create } from "zustand";
-import userSlice from './slices/user.slice.js';
+import { create } from 'zustand'
+import createUserSlice from './slices/user.slice.js'
 
 
-// Combine all slices in the store:
+
+// Combine user slice and dashboard slice
 const useStore = create((...args) => ({
-  ...userSlice(...args),
+  ...createUserSlice(...args),
+
+ 
+
 }))
 
+export default useStore
 
-export default useStore;
+
+
