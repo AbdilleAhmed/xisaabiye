@@ -3,158 +3,191 @@ const router = express.Router();
 const pool = require("../modules/pool");
 const { rejectUnauthenticated, rejectIfNotAdmin } = require("../modules/authentication-middleware");
 
-
-// get all transactions (only for admin)
-// rejectUnauthenticated, rejectIfNotAdmin middlewares used
-router.get("/", rejectUnauthenticated, rejectIfNotAdmin, async (req, res) => {
+router.get("/", rejectUnauthenticated, async (req, res) => {
   try {
     const queryText = `
-      SELECT t.*, c.firstname, c.lastname, u.username
+      SELECT t.*, c.firstname, c.lastname 
       FROM transactions t
       JOIN customers c ON t.customer_id = c.id
-      JOIN users u ON t.user_id = u.id
       ORDER BY t.created_at DESC;
     `;
-
     const result = await pool.query(queryText);
     res.json(result.rows);
   } catch (error) {
-    console.error("Error getting transactions:", error);
-    res.status(500).json({ error: "internal serveer error" });
-  }
-});
-
-// summary route
-
-router.get("/summary", rejectUnauthenticated, rejectIfNotAdmin, async (req, res) => {
-  try {
-    const query = `
-      SELECT 
-        (SELECT COUNT(*) FROM customers) AS total_customers,
-        (SELECT COUNT(*) FROM transactions) AS total_transactions,
-        COALESCE(SUM(t.amount_paid), 0) AS total_paid,
-        COALESCE(SUM(t.balance_after), 0) AS total_debt
-      FROM transactions t;
-    `;
-    const result = await pool.query(query);
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error("Error fetching summary:", error);
+    console.error("Error fetching transactions:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// get all transactions 
-router.get("/customer/:id", rejectUnauthenticated, async (req, res) => {
+router.get("/search", rejectUnauthenticated, async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT * FROM transactions WHERE customer_id = $1 ORDER BY created_at DESC;`,
-      [req.params.id]
-    );
+    const { q } = req.query;
+    if (!q || q.trim() === "") {
+      const result = await pool.query(`
+        SELECT t.*, c.firstname, c.lastname 
+        FROM transactions t
+        JOIN customers c ON t.customer_id = c.id
+        ORDER BY t.created_at DESC;
+      `);
+      return res.json(result.rows);
+    }
+    const queryText = `
+      SELECT t.*, c.firstname, c.lastname 
+      FROM transactions t
+      JOIN customers c ON t.customer_id = c.id
+      WHERE 
+        LOWER(c.firstname) LIKE LOWER($1) OR
+        LOWER(c.lastname) LIKE LOWER($1) OR
+        LOWER(t.transaction_type) LIKE LOWER($1)
+      ORDER BY t.created_at DESC;
+    `;
+    const searchTerm = `%${q}%`;
+    const result = await pool.query(queryText, [searchTerm]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error searching transactions:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/customer/:customerId", rejectUnauthenticated, async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const queryText = `
+      SELECT t.*, c.firstname, c.lastname 
+      FROM transactions t
+      JOIN customers c ON t.customer_id = c.id
+      WHERE t.customer_id = $1
+      ORDER BY t.created_at DESC;
+    `;
+    const result = await pool.query(queryText, [customerId]);
     res.json(result.rows);
   } catch (error) {
     console.error("Error fetching customer transactions:", error);
-    res.status(500).json({ error: "not found" });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// post new transactions route
-router.post('/', rejectUnauthenticated, async (req, res) => {
+router.get("/:id", rejectUnauthenticated, async (req, res) => {
   try {
-    const { customer_id, transaction_type, total_amount, amount_paid } = req.body;
-    const user_id = req.user.id;
+    const result = await pool.query(
+      `SELECT t.*, c.firstname, c.lastname 
+       FROM transactions t
+       JOIN customers c ON t.customer_id = c.id
+       WHERE t.id = $1;`,
+      [req.params.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching transaction:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
-    const lastBalanceQuery = `
-      SELECT balance_after 
-      FROM transactions 
-      WHERE customer_id = $1 
-      ORDER BY id DESC 
-      LIMIT 1;
-    `;
-    const lastBalanceResult = await pool.query(lastBalanceQuery, [customer_id]);
+router.post("/", rejectUnauthenticated, async (req, res) => {
+  try {
+    const { customer_id, transaction_type, amount } = req.body;
 
-    const previous_balance = lastBalanceResult.rows.length > 0 
-      ? parseFloat(lastBalanceResult.rows[0].balance_after)
-      : 0;
-
-    let new_balance;
-
-    if (transaction_type === 'credit') {
-      new_balance = previous_balance + (parseFloat(total_amount) - parseFloat(amount_paid));
-    } else if (transaction_type === 'debit') {
-      new_balance = previous_balance - (parseFloat(total_amount) - parseFloat(amount_paid));
-    } else {
-      return res.status(400).json({ error: 'Invalid transaction type' });
+    if (!customer_id || !transaction_type || !amount) {
+      return res.status(400).json({ error: "All fields are required" });
     }
 
-    const insertQuery = `
-      INSERT INTO transactions 
-      (user_id, customer_id, transaction_type, total_amount, amount_paid)
-      VALUES ($1, $2, $3, $4, $5)
+    if (!["credit", "debit"].includes(transaction_type.toLowerCase())) {
+      return res.status(400).json({ error: "Transaction type must be 'credit' or 'debit'" });
+    }
+
+    if (isNaN(amount) || parseFloat(amount) <= 0) {
+      return res.status(400).json({ error: "Amount must be a positive number" });
+    }
+
+    const balanceQuery = `
+      SELECT balance_after FROM transactions 
+      WHERE customer_id = $1 
+      ORDER BY created_at DESC 
+      LIMIT 1;
+    `;
+    const balanceResult = await pool.query(balanceQuery, [customer_id]);
+    const lastBalance = balanceResult.rows.length ? parseFloat(balanceResult.rows[0].balance_after) : 0;
+
+    let newBalance = lastBalance;
+    if (transaction_type.toLowerCase() === "credit") {
+      newBalance += parseFloat(amount);
+    }
+    if (transaction_type.toLowerCase() === "debit") {
+      newBalance -= parseFloat(amount);
+    }
+
+    const queryText = `
+      INSERT INTO transactions (customer_id, transaction_type, amount, balance_after)
+      VALUES ($1, $2, $3, $4)
       RETURNING *;
     `;
-    const result = await pool.query(insertQuery, [
-      user_id,
-      customer_id,
-      transaction_type,
-      total_amount,
-      amount_paid
-    ]);
-
-    res.status(201).json({
-      ...result.rows[0],
-      computed_balance_after: new_balance
-    });
+    const result = await pool.query(queryText, [customer_id, transaction_type.toLowerCase(), parseFloat(amount), newBalance]);
+    res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error('Error adding transaction:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error adding transaction:", error);
+    res.status(500).json({ error: "Internal server error", details: error.message });
   }
 });
 
-
-// update treansactions route
-
 router.put("/:id", rejectUnauthenticated, async (req, res) => {
-  const { id } = req.params;
-  const { transaction_type, total_amount, amount_paid } = req.body;
-
   try {
+    const { id } = req.params;
+    const { transaction_type, amount } = req.body;
+
+    if (!transaction_type || !amount) {
+      return res.status(400).json({ error: "Transaction type and amount are required" });
+    }
+
+    if (!["credit", "debit"].includes(transaction_type.toLowerCase())) {
+      return res.status(400).json({ error: "Transaction type must be 'credit' or 'debit'" });
+    }
+
+    if (isNaN(amount) || parseFloat(amount) <= 0) {
+      return res.status(400).json({ error: "Amount must be a positive number" });
+    }
+
     const result = await pool.query(
       `UPDATE transactions
        SET transaction_type = $1,
-           total_amount = $2::numeric,
-           amount_paid = $3::numeric,
-           balance_after = ($2::numeric - $3::numeric),
+           amount = $2,
            updated_at = NOW()
-       WHERE id = $4
+       WHERE id = $3
        RETURNING *;`,
-      [transaction_type, total_amount, amount_paid, id]
+      [transaction_type.toLowerCase(), parseFloat(amount), id]
     );
 
-    if (result.rowCount === 0) return res.status(404).json({ error: "Transaction not found" });
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+
     res.json(result.rows[0]);
   } catch (error) {
     console.error("Error updating transaction:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error", details: error.message });
   }
 });
-
-
-// delete route (only for admin)
 
 router.delete("/:id", rejectUnauthenticated, rejectIfNotAdmin, async (req, res) => {
   try {
-    await pool.query("DELETE FROM transactions WHERE id = $1;", [req.params.id]);
-    res.sendStatus(204);
+    const { id } = req.params;
+    const result = await pool.query(
+      `DELETE FROM transactions WHERE id = $1 RETURNING *;`,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+
+    res.status(200).json({ message: "Transaction deleted successfully" });
   } catch (error) {
     console.error("Error deleting transaction:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error", details: error.message });
   }
 });
-
-
-// get summary route (for admins only)
-
-
 
 module.exports = router;
