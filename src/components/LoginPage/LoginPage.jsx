@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { LogIn, Globe } from 'lucide-react';
 import useStore from '../../zustand/store';
-import useLanguageStore from '../../zustand/slices/language.slice'; 
+import useLanguageStore from '../../zustand/slices/language.slice';
+import './LoginPage.css';
 
 function LoginPage() {
   const [username, setUsername] = useState('');
@@ -14,7 +16,6 @@ function LoginPage() {
   const t = translations[language].login; 
 
   useEffect(() => {
-    // Clear the auth error message when the component unmounts:
     return () => {
       setAuthErrorMessage('');
     };
@@ -22,7 +23,6 @@ function LoginPage() {
 
   const handleLogIn = (event) => {
     event.preventDefault();
-
     logIn({
       username: username,
       password: password,
@@ -30,63 +30,53 @@ function LoginPage() {
   };
 
   return (
-    <>
-      <h2 className="text-center mt-4 mb-3">{t.title}</h2>
+    <div className="login-container">
+        <div className="language-switcher">
+        <Globe size={16} style={{ marginRight: '8px' }} />
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          className="language-select"
+          title="Select language"
+        >
+          <option value="en">English</option>
+          <option value="so">Somali</option>
+        </select>
+      </div>
+      <h2 className="login-title">{t.title}</h2>
 
-      <form onSubmit={handleLogIn} className="container p-4 border rounded shadow-sm" style={{ maxWidth: '400px' }}>
-        <div className="mb-3">
-          <label htmlFor="username" className="form-label">{t.username}:</label>
-          <input
-            type="text"
-            id="username"
-            className="form-control"
-            required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
+      <form onSubmit={handleLogIn} className="login-form">
+        <input
+          type="text"
+          placeholder={t.username}
+          className="login-input"
+          required
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
 
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">{t.password}:</label>
-          <input
-            type="password"
-            id="password"
-            className="form-control"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        <input
+          type="password"
+          placeholder={t.password}
+          className="login-input"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-        <button type="submit" className="btn btn-success w-100">
+        <button type="submit" className="login-button">
+          <LogIn size={20} style={{ marginRight: '8px' }} />
           {t.button}
         </button>
       </form>
 
       {errorMessage && (
-        <h5 className="text-danger text-center mt-3">{errorMessage}</h5>
+        <div className="login-error">{errorMessage}</div>
       )}
 
-      {/* Language switch buttons */}
-      <div className="text-center mt-3">
-        <button
-          className="btn btn-outline-primary me-2"
-          onClick={() => setLanguage('en')}
-          disabled={language === 'en'}
-        >
-          English
-        </button>
-        <button
-          className="btn btn-outline-primary"
-          onClick={() => setLanguage('so')}
-          disabled={language === 'so'}
-        >
-          Somali
-        </button>
-      </div>
-    </>
+    
+    </div>
   );
 }
 
 export default LoginPage;
-

@@ -15,10 +15,3 @@
   font-size: 18px;
   cursor: pointer;
 }
-
-.dashboard-btn-primary {
-  border: none;
-  background-color: #000;
-  color: white;
-  font-weight: bold;
-}

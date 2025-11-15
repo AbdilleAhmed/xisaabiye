@@ -6,55 +6,59 @@ function RegisterPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("staff");
+
   const register = useStore((state) => state.register);
   const errorMessage = useStore((state) => state.authErrorMessage);
   const setAuthErrorMessage = useStore((state) => state.setAuthErrorMessage);
 
-  const { language, translations, setLanguage } = useLanguageStore();
+  const { language, translations } = useLanguageStore();
   const t = translations[language].admin;
+  const loginT = translations[language].login;
 
   useEffect(() => {
     return () => {
       setAuthErrorMessage("");
     };
-  }, []);
+  }, [setAuthErrorMessage]);
 
   const handleRegister = (event) => {
     event.preventDefault();
-
-    register({
-      username: username,
-      password: password,
-      role: role,
-    });
+    register({ username, password, role });
   };
 
   return (
-    <div style={{ 
-      maxWidth: "600px", 
-      margin: "0 auto", 
-      padding: "20px",
-      fontFamily: "Arial, sans-serif"
-    }}>
+    <div
+      style={{
+        maxWidth: "600px",
+        margin: "0 auto",
+        padding: "20px",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
       <h1 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "30px" }}>
         {t.registerUser}
       </h1>
 
-      <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+      <form
+        onSubmit={handleRegister}
+        style={{ display: "flex", flexDirection: "column", gap: "15px" }}
+      >
         <div>
-          <label style={{ 
-            display: "block", 
-            fontSize: "16px", 
-            marginBottom: "8px",
-            fontWeight: "500"
-          }}>
-            {t.username || "Username"}:
+          <label
+            style={{
+              display: "block",
+              fontSize: "16px",
+              marginBottom: "8px",
+              fontWeight: "500",
+            }}
+          >
+            {t.username}:
           </label>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder={translations[language].login?.pleaseEnterUsername}
+            placeholder={loginT.pleaseEnterUsername}
             required
             style={{
               width: "100%",
@@ -62,25 +66,27 @@ function RegisterPage() {
               fontSize: "16px",
               border: "1px solid #ddd",
               borderRadius: "8px",
-              boxSizing: "border-box"
+              boxSizing: "border-box",
             }}
           />
         </div>
 
         <div>
-          <label style={{ 
-            display: "block", 
-            fontSize: "16px", 
-            marginBottom: "8px",
-            fontWeight: "500"
-          }}>
-            {t.password || "Password"}:
+          <label
+            style={{
+              display: "block",
+              fontSize: "16px",
+              marginBottom: "8px",
+              fontWeight: "500",
+            }}
+          >
+            {t.password}:
           </label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder={translations[language].login?.pleaseEnterPassword}
+            placeholder={loginT.pleaseEnterPassword}
             required
             style={{
               width: "100%",
@@ -88,19 +94,21 @@ function RegisterPage() {
               fontSize: "16px",
               border: "1px solid #ddd",
               borderRadius: "8px",
-              boxSizing: "border-box"
+              boxSizing: "border-box",
             }}
           />
         </div>
 
         <div>
-          <label style={{ 
-            display: "block", 
-            fontSize: "16px", 
-            marginBottom: "8px",
-            fontWeight: "500"
-          }}>
-            {t.role || "Role"}:
+          <label
+            style={{
+              display: "block",
+              fontSize: "16px",
+              marginBottom: "8px",
+              fontWeight: "500",
+            }}
+          >
+            {t.role}:
           </label>
           <select
             value={role}
@@ -112,12 +120,12 @@ function RegisterPage() {
               border: "1px solid #ddd",
               borderRadius: "8px",
               boxSizing: "border-box",
-              cursor: "pointer"
+              cursor: "pointer",
             }}
           >
-            <option value="staff">{t.staff || "Staff"}</option>
-            <option value="admin">{t.admin || "Admin"}</option>
-            <option value="owner">{t.storeOwner || "Owner"}</option>
+            <option value="staff">{t.staff}</option>
+            <option value="admin">{t.admin}</option>
+            <option value="owner">{t.storeOwner}</option>
           </select>
         </div>
 
@@ -132,7 +140,7 @@ function RegisterPage() {
             fontSize: "16px",
             fontWeight: "bold",
             cursor: "pointer",
-            marginTop: "10px"
+            marginTop: "10px",
           }}
         >
           {t.registerUser}
@@ -140,7 +148,9 @@ function RegisterPage() {
       </form>
 
       {errorMessage && (
-        <h5 style={{ color: "#dc3545", textAlign: "center", marginTop: "20px" }}>
+        <h5
+          style={{ color: "#dc3545", textAlign: "center", marginTop: "20px" }}
+        >
           {errorMessage}
         </h5>
       )}
@@ -149,4 +159,5 @@ function RegisterPage() {
 }
 
 export default RegisterPage;
+
 

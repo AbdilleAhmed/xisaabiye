@@ -23,9 +23,11 @@ const en = {
   },
   about: {
     title: "About",
-    description: "Xisaabiye is a grocery credit management system designed for small shop owners.",
-    quote: "Intelligence doesn’t seem like an aspect of personal character, and it isn’t.",
-    quoteAuthor: "— From Steve McConnell's Code Complete"
+    description:
+      "Xisaabiye is a grocery credit management system designed for small shop owners.",
+    quote:
+      "Intelligence doesn’t seem like an aspect of personal character, and it isn’t.",
+    quoteAuthor: "— From Steve McConnell's Code Complete",
   },
   dashboard: {
     welcome: "Welcome",
@@ -33,7 +35,10 @@ const en = {
     totalCustomers: "Total Customers",
     totalTransactions: "Total Transactions",
     totalCredit: "Total Credit",
-    totalDebit: "Total Debit"
+    totalDebit: "Total Debit",
+    addTransaction: "Add New Transaction",
+    addClient: "Add New Client",
+    reports: "Reports",
   },
   customers: {
     title: "Customers",
@@ -45,7 +50,7 @@ const en = {
     notes: "Notes",
     noCustomers: "No customers found",
     pleaseEnterName: "Please enter customer name",
-    pleaseEnterPhone: "Please enter phone number"
+    pleaseEnterPhone: "Please enter phone number",
   },
   transactions: {
     title: "Transactions",
@@ -62,7 +67,7 @@ const en = {
     customer: "Customer",
     staff: "Handled By",
     noTransactions: "No transactions found",
-    pleaseEnterAmount: "Please enter amount"
+    pleaseEnterAmount: "Please enter amount",
   },
   admin: {
     title: "Admin Panel",
@@ -72,14 +77,25 @@ const en = {
     role: "Role",
     staff: "Staff",
     storeOwner: "Store Owner",
+      title: "Admin Panel",
+  registerUser: "Register User",
+  allUsers: "All Users",
+  reports: "Reports",
+  role: "Role",
+  staff: "Staff",
+  admin: "Admin",
+  storeOwner: "Store Owner",
+  username: "Username",
+  password: "Password"
   },
   messages: {
     addedSuccess: "Added successfully",
     updatedSuccess: "Updated successfully",
     deletedSuccess: "Deleted successfully",
-    errorOccurred: "An error occurred"
-  }
+    errorOccurred: "An error occurred",
+  },
 };
 
 export default en;
+
 

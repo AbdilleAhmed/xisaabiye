@@ -4,15 +4,9 @@ const pool = require('../modules/pool');
 const userStrategy = require('../strategies/user.strategy');
 const { rejectIfNotAdmin } = require('../modules/authentication-middleware');
 
-
-
-
 const router = express.Router();
 
-// If the request came from an authenticated user, this route
-// sends back an object containing that user's information.
-// Otherwise, it sends back an empty object to indicate there
-// is not an active session.
+
 router.get('/', (req, res) => {
   if (req.isAuthenticated()) {
     res.send(req.user);
@@ -23,17 +17,19 @@ router.get('/', (req, res) => {
 
 // Handles the logic for creating a new user. The one extra wrinkle here is
 // that we hash the password before inserting it into the database.
-router.post('/register', rejectIfNotAdmin, (req, res, next) => {
+router.post('/register',rejectIfNotAdmin, (req, res, next) => {
  
-//gets the username and password will be hashed
+  //gets the username and password will be hashed
   const username = req.body.username;
   const hashedPassword = encryptLib.encryptPassword(req.body.password);
   const role = req.body.role;
-// validations 
-   if (!username || !req.body.password) {
-  return res.status(400).send({ error: 'Username and password required' });
-}
-// sql query
+  
+  // validations 
+  if (!username || !req.body.password) {
+    return res.status(400).send({ error: 'Username and password required' });
+  }
+  
+  // sql query
   const sqlText = `
     INSERT INTO "users"
       ("username", "password" , "role")
@@ -48,7 +44,13 @@ router.post('/register', rejectIfNotAdmin, (req, res, next) => {
     })
     .catch((dbErr) => {
       console.log('POST /api/users/register error: ', dbErr);
-      res.sendStatus(500);
+      
+      // Check for duplicate username error (PostgreSQL unique constraint violation)
+      if (dbErr.code === '23505') {
+        return res.status(409).send({ error: 'Username already taken' });
+      }
+      
+      res.status(500).send({ error: 'Server error during registration' });
     });
 });
 
@@ -71,6 +73,5 @@ router.delete('/logout', (req, res, next) => {
     res.sendStatus(200);
   });
 });
-
 
 module.exports = router;
