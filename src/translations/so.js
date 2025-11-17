@@ -23,9 +23,11 @@ const so = {
   },
   about: {
     title: "Ku Saabsan",
-    description: "Xisaabiye waa nidaam xisaabeed oo loogu talagalay dukaamada yaryar si ay u maareeyaan amaahda macaamiisha.",
-    quote: "Caqligu uma muuqdo inuu yahay qayb ka mid ah dabeecadda qofka, waana sidaas.",
-    quoteAuthor: "— Laga soo qaatay Code Complete, Steve McConnell"
+    description:
+      "Xisaabiye waa nidaam xisaabeed oo loogu talagalay dukaamada yaryar si ay u maareeyaan amaahda macaamiisha.",
+    quote:
+      "Caqligu uma muuqdo inuu yahay qayb ka mid ah dabeecadda qofka, waana sidaas.",
+    quoteAuthor: "— Laga soo qaatay Code Complete, Steve McConnell",
   },
   dashboard: {
     welcome: "Soo dhawoow",
@@ -33,7 +35,10 @@ const so = {
     totalCustomers: "Macaamiisha Guud",
     totalTransactions: "Xisaabaadka Guud",
     totalCredit: "Amaahda Guud",
-    totalDebit: "Deynta Guud"
+    totalDebit: "Deynta Guud",
+    addTransaction: "Ku dar Xisaab Cusub",
+    addClient: "Ku dar Macaamiil Cusub",
+    reports: "Warbixinno",
   },
   customers: {
     title: "Macaamiisha",
@@ -45,7 +50,7 @@ const so = {
     notes: "Fiiro gaar ah",
     noCustomers: "Macaamiil la helin",
     pleaseEnterName: "Fadlan gali magaca macaamilka",
-    pleaseEnterPhone: "Fadlan gali lambarka telefoonka"
+    pleaseEnterPhone: "Fadlan gali lambarka telefoonka",
   },
   transactions: {
     title: "Xisaabaadka",
@@ -58,11 +63,11 @@ const so = {
     balance: "Hadhaaga",
     total: "Wadarta",
     credit: "Amaah",
-    debit: "Deynta",
+    debit: "Deyn",
     customer: "Macaamiil",
     staff: "Shaqaale ka shaqeeyey",
     noTransactions: "Xisaab la helin",
-    pleaseEnterAmount: "Fadlan gali lacagta"
+    pleaseEnterAmount: "Fadlan gali lacagta",
   },
   admin: {
     title: "Maamulka",
@@ -77,8 +82,22 @@ const so = {
     addedSuccess: "Si guul leh ayaa loo daray",
     updatedSuccess: "Si guul leh ayaa loo cusboonaysiiyey",
     deletedSuccess: "Si guul leh ayaa loo tirtiray",
-    errorOccurred: "Waxaa dhacay qalad"
-  }
+    errorOccurred: "Waxaa dhacay qalad",
+    admin: {
+  title: "Maamulka",
+  registerUser: "Diiwaangeli Isticmaale",
+  allUsers: "Dhammaan Isticmaaleyaasha",
+  reports: "Warbixinno",
+  role: "Doorka",
+  staff: "Shaqaale",
+  admin: "Maamul",
+  storeOwner: "Milkiilaha Dukaanka",
+  username: "Magaca Isticmaale",
+  password: "Furaha Sirta"
+},
+
+  },
 };
 
 export default so;
+

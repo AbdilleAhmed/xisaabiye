@@ -33,6 +33,7 @@ function Nav() {
                 {language === 'so' ? 'Dashboard' : 'Dashboard'}
               </NavLink>
             </li>
+          
             {(user.role === 'admin' || user.role === 'owner') && (
               <li>
                 <NavLink to="/registration" style={{ textDecoration: 'none', color: 'black' }}>
@@ -56,20 +57,10 @@ function Nav() {
             {tAbout.title}
           </NavLink>
         </li>
-        {/* <NavLink to="/addtransaction">Add Transaction</NavLink> */}
-
-
-    
-       
-     
-
       </ul>
     </nav>
   );
 }
 
 export default Nav;
-
-
-
 

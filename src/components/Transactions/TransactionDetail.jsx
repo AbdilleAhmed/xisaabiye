@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useCustomerStore } from "../../zustand/slices/customer.slice";
 import { useTransactionStore } from "../../zustand/slices/transactions.slice";
+import "./TransactionDetail.css";
 
 export default function TransactionDetail() {
   const { customers, fetchCustomers } = useCustomerStore();
@@ -153,182 +154,81 @@ export default function TransactionDetail() {
 
   const selectedCustomerData = customers.find((c) => c.id == selectedCustomer);
 
-  const calculateBalance = () => {
-    if (transactions.length === 0) return 0;
-    const balance = transactions[0]?.balance_after;
-    return typeof balance === 'string' ? parseFloat(balance) : balance;
-  };
-
-  const getTransactionTypeDescription = (type) => {
-    if (type === "credit") {
-      return "Payment received from customer";
-    } else if (type === "debit") {
-      return "Amount owed by customer";
-    }
-    return "";
-  };
-
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f5f5f5", padding: "40px 20px" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        <div style={{ marginBottom: "40px" }}>
-          <h1 style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "10px" }}>
-            Transactions
-          </h1>
-          <p style={{ color: "#666", fontSize: "14px" }}>
-            Manage customer transactions
-          </p>
+    <div className="transaction-detail-container">
+      <div className="transaction-detail-wrapper">
+        <div className="transaction-detail-header">
+          <h1 className="transaction-detail-title">Transactions</h1>
+          <p className="transaction-detail-subtitle">Manage customer transactions</p>
         </div>
 
         {message && (
-          <div
-            style={{
-              backgroundColor: messageType === "success" ? "#e8f5e9" : "#ffebee",
-              color: messageType === "success" ? "#2e7d32" : "#c62828",
-              padding: "12px 16px",
-              borderRadius: "8px",
-              marginBottom: "20px",
-              border: `1px solid ${messageType === "success" ? "#c8e6c9" : "#ef9a9a"}`,
-            }}
-          >
+          <div className={`message-alert ${messageType}`}>
             {message}
           </div>
         )}
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "30px",
-            marginBottom: "40px",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-              padding: "30px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            }}
-          >
-            <h2 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "20px", color: "#333" }}>
-              Search Customer
-            </h2>
+        <div className="transaction-grid">
+          <div className="card">
+            <h2 className="card-title">Search Customer</h2>
 
             <input
               type="text"
               placeholder="Search by name or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "8px",
-                border: "2px solid #2196F3",
-                fontSize: "15px",
-                boxSizing: "border-box",
-                marginBottom: "15px",
-              }}
+              className="search-input"
             />
 
-            <div
-              style={{
-                maxHeight: "400px",
-                overflowY: "auto",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-              }}
-            >
+            <div className="customer-list">
               {filteredCustomers.length === 0 ? (
-                <p style={{ padding: "20px", color: "#888", textAlign: "center" }}>
-                  No customers found
-                </p>
+                <p className="customer-list-empty">No customers found</p>
               ) : (
                 filteredCustomers.map((customer) => (
                   <div
                     key={customer.id}
                     onClick={() => handleSelectCustomer(customer.id)}
-                    style={{
-                      padding: "12px 16px",
-                      borderBottom: "1px solid #eee",
-                      cursor: "pointer",
-                      backgroundColor: selectedCustomer == customer.id ? "#f0f0f0" : "#fff",
-                      transition: "all 0.2s",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9f9f9")}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = selectedCustomer == customer.id ? "#f0f0f0" : "#fff")}
+                    className={`customer-item ${selectedCustomer == customer.id ? "selected" : ""}`}
                   >
-                    <p style={{ margin: "0 0 3px 0", fontWeight: "bold", fontSize: "14px" }}>
+                    <p className="customer-name">
                       {customer.firstname} {customer.lastname}
                     </p>
-                    <p style={{ margin: "0", color: "#666", fontSize: "12px" }}>
-                      {customer.phone || "No phone"}
-                    </p>
+                    <p className="customer-phone">{customer.phone || "No phone"}</p>
                   </div>
                 ))
               )}
             </div>
           </div>
 
-          <div
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-              padding: "30px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            }}
-          >
-            <h2 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "20px", color: "#333" }}>
+          <div className="card">
+            <h2 className="card-title">
               {selectedCustomer ? "Add Transaction" : "Select a Customer"}
             </h2>
 
             {selectedCustomer && (
-              <>
-                <div style={{ marginBottom: "20px", padding: "12px", backgroundColor: "#f9f9f9", borderRadius: "8px" }}>
-                  <p style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#666" }}>
-                    <strong>Customer:</strong> {selectedCustomerData?.firstname} {selectedCustomerData?.lastname}
-                  </p>
-                  <p style={{ margin: "0", fontSize: "14px", color: "#666" }}>
-                    <strong>Balance:</strong> <span style={{ fontSize: "18px", fontWeight: "bold", color: calculateBalance() >= 0 ? "#2e7d32" : "#c62828" }}>
-                      ${calculateBalance().toFixed(2)}
-                    </span>
-                  </p>
-                </div>
-              </>
+              <div className="customer-info-box">
+                <p className="customer-info-text">
+                  <strong>Customer:</strong> {selectedCustomerData?.firstname} {selectedCustomerData?.lastname}
+                </p>
+              </div>
             )}
 
             {selectedCustomer ? (
-              <form onSubmit={handleAddTransaction} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: "bold", marginBottom: "8px" }}>
-                    Type:
-                  </label>
+              <form onSubmit={handleAddTransaction} className="transaction-form">
+                <div className="form-group">
+                  <label className="form-label">Type:</label>
                   <select
                     value={transactionType}
                     onChange={(e) => setTransactionType(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      borderRadius: "8px",
-                      border: "1px solid #ccc",
-                      fontSize: "15px",
-                      boxSizing: "border-box",
-                    }}
+                    className="form-select"
                   >
-                    <option value="credit">Credit - Payment received</option>
-                    <option value="debit">Debit - Amount owed</option>
+                    <option value="credit">Credit</option>
+                    <option value="debit">Debit</option>
                   </select>
-                  <p style={{ margin: "8px 0 0 0", fontSize: "12px", color: "#888", fontStyle: "italic" }}>
-                    {getTransactionTypeDescription(transactionType)}
-                  </p>
                 </div>
 
-                <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: "bold", marginBottom: "8px" }}>
-                    Amount:
-                  </label>
+                <div className="form-group">
+                  <label className="form-label">Amount:</label>
                   <input
                     type="number"
                     value={amount}
@@ -336,40 +236,20 @@ export default function TransactionDetail() {
                     placeholder="Enter amount"
                     min="0.01"
                     step="0.01"
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      borderRadius: "8px",
-                      border: "1px solid #ccc",
-                      fontSize: "15px",
-                      boxSizing: "border-box",
-                    }}
+                    className="form-input"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  style={{
-                    padding: "12px",
-                    borderRadius: "8px",
-                    border: "none",
-                    backgroundColor: loading ? "#ccc" : "#000",
-                    color: "#fff",
-                    cursor: loading ? "not-allowed" : "pointer",
-                    fontWeight: "bold",
-                    fontSize: "15px",
-                    marginTop: "10px",
-                    transition: "all 0.3s",
-                  }}
-                  onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = "#333")}
-                  onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = "#000")}
+                  className="btn btn-primary"
                 >
                   {loading ? "Adding..." : "Add Transaction"}
                 </button>
               </form>
             ) : (
-              <p style={{ color: "#888", textAlign: "center", marginTop: "20px" }}>
+              <p className="empty-state">
                 Select a customer from the list to add a transaction
               </p>
             )}
@@ -377,182 +257,92 @@ export default function TransactionDetail() {
         </div>
 
         {selectedCustomer && isFetched && transactions.length > 0 && (
-          <div
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-              padding: "30px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h2 style={{ margin: "0", color: "#333" }}>
-                Transactions for {selectedCustomerData?.firstname} {selectedCustomerData?.lastname}
-              </h2>
-              <div style={{ textAlign: "right" }}>
-                <p style={{ margin: "0 0 5px 0", fontSize: "12px", color: "#666" }}>Current Balance:</p>
-                <p style={{ margin: "0", fontSize: "24px", fontWeight: "bold", color: calculateBalance() >= 0 ? "#2e7d32" : "#c62828" }}>
-                  ${calculateBalance().toFixed(2)}
-                </p>
-              </div>
-            </div>
+          <div className="card">
+            <h2 className="card-title">
+              Transactions for {selectedCustomerData?.firstname} {selectedCustomerData?.lastname}
+            </h2>
 
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <div className="transaction-table-wrapper">
+              <table className="transaction-table">
                 <thead>
-                  <tr style={{ borderBottom: "2px solid #ddd" }}>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "bold" }}>Type</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "bold" }}>Amount</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "bold" }}>Balance</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "bold" }}>Actions</th>
+                  <tr>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {transactions.map((t) => {
-                    const transactionBalance = typeof t.balance_after === 'string' ? parseFloat(t.balance_after) : t.balance_after;
-                    return (
-                      <tr key={t.id} style={{ borderBottom: "1px solid #eee" }}>
-                        <td style={{ padding: "12px" }}>
+                  {transactions.map((t) => (
+                    <tr key={t.id}>
+                      <td>
+                        {editingTransactionId === t.id ? (
+                          <select
+                            value={editedType}
+                            onChange={(e) => setEditedType(e.target.value)}
+                            className="table-select"
+                          >
+                            <option value="credit">Credit</option>
+                            <option value="debit">Debit</option>
+                          </select>
+                        ) : (
+                          <span className="transaction-type">{t.transaction_type}</span>
+                        )}
+                      </td>
+                      <td>
+                        {editingTransactionId === t.id ? (
+                          <input
+                            type="number"
+                            value={editedAmount}
+                            onChange={(e) => setEditedAmount(e.target.value)}
+                            min="0.01"
+                            step="0.01"
+                            className="table-input"
+                          />
+                        ) : (
+                          <span className="transaction-amount">${t.amount.toFixed(2)}</span>
+                        )}
+                      </td>
+                      <td>
+                        <div className="action-buttons">
                           {editingTransactionId === t.id ? (
-                            <select
-                              value={editedType}
-                              onChange={(e) => setEditedType(e.target.value)}
-                              style={{
-                                padding: "8px",
-                                borderRadius: "6px",
-                                border: "1px solid #ccc",
-                                fontSize: "14px",
-                              }}
-                            >
-                              <option value="credit">Credit</option>
-                              <option value="debit">Debit</option>
-                            </select>
+                            <>
+                              <button
+                                onClick={() => handleUpdate(t.id)}
+                                disabled={loading}
+                                className="btn btn-success"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={handleCancelEdit}
+                                disabled={loading}
+                                className="btn btn-secondary"
+                              >
+                                Cancel
+                              </button>
+                            </>
                           ) : (
-                            <div>
-                              <span style={{ fontWeight: "bold", textTransform: "capitalize" }}>
-                                {t.transaction_type}
-                              </span>
-                              <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#888" }}>
-                                {getTransactionTypeDescription(t.transaction_type)}
-                              </p>
-                            </div>
+                            <>
+                              <button
+                                onClick={() => handleEdit(t)}
+                                disabled={loading}
+                                className="btn btn-warning"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDelete(t.id)}
+                                disabled={loading}
+                                className="btn btn-danger"
+                              >
+                                Delete
+                              </button>
+                            </>
                           )}
-                        </td>
-                        <td style={{ padding: "12px" }}>
-                          {editingTransactionId === t.id ? (
-                            <input
-                              type="number"
-                              value={editedAmount}
-                              onChange={(e) => setEditedAmount(e.target.value)}
-                              min="0.01"
-                              step="0.01"
-                              style={{
-                                padding: "8px",
-                                borderRadius: "6px",
-                                border: "1px solid #ccc",
-                                fontSize: "14px",
-                                width: "100px",
-                              }}
-                            />
-                          ) : (
-                            <span style={{ fontWeight: "bold" }}>${t.amount.toFixed(2)}</span>
-                          )}
-                        </td>
-                        <td style={{ padding: "12px" }}>
-                          <span style={{ fontWeight: "bold", color: transactionBalance >= 0 ? "#2e7d32" : "#c62828" }}>
-                            ${transactionBalance.toFixed(2)}
-                          </span>
-                        </td>
-                        <td style={{ padding: "12px" }}>
-                          <div style={{ display: "flex", gap: "8px" }}>
-                            {editingTransactionId === t.id ? (
-                              <>
-                                <button
-                                  onClick={() => handleUpdate(t.id)}
-                                  disabled={loading}
-                                  style={{
-                                    padding: "8px 12px",
-                                    borderRadius: "6px",
-                                    border: "none",
-                                    backgroundColor: loading ? "#ccc" : "#4CAF50",
-                                    color: "#fff",
-                                    cursor: loading ? "not-allowed" : "pointer",
-                                    fontWeight: "bold",
-                                    fontSize: "13px",
-                                    transition: "all 0.3s",
-                                  }}
-                                  onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = "#45a049")}
-                                  onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = "#4CAF50")}
-                                >
-                                  Save
-                                </button>
-                                <button
-                                  onClick={handleCancelEdit}
-                                  disabled={loading}
-                                  style={{
-                                    padding: "8px 12px",
-                                    borderRadius: "6px",
-                                    border: "1px solid #ccc",
-                                    backgroundColor: "#f5f5f5",
-                                    cursor: loading ? "not-allowed" : "pointer",
-                                    fontWeight: "bold",
-                                    fontSize: "13px",
-                                    transition: "all 0.3s",
-                                  }}
-                                  onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = "#e0e0e0")}
-                                  onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = "#f5f5f5")}
-                                >
-                                  Cancel
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <button
-                                  onClick={() => handleEdit(t)}
-                                  disabled={loading}
-                                  style={{
-                                    padding: "8px 12px",
-                                    borderRadius: "6px",
-                                    border: "none",
-                                    backgroundColor: loading ? "#ccc" : "#FFC107",
-                                    color: "#fff",
-                                    cursor: loading ? "not-allowed" : "pointer",
-                                    fontWeight: "bold",
-                                    fontSize: "13px",
-                                    transition: "all 0.3s",
-                                  }}
-                                  onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = "#FFB300")}
-                                  onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = "#FFC107")}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(t.id)}
-                                  disabled={loading}
-                                  style={{
-                                    padding: "8px 12px",
-                                    borderRadius: "6px",
-                                    border: "none",
-                                    backgroundColor: loading ? "#ccc" : "#f44336",
-                                    color: "#fff",
-                                    cursor: loading ? "not-allowed" : "pointer",
-                                    fontWeight: "bold",
-                                    fontSize: "13px",
-                                    transition: "all 0.3s",
-                                  }}
-                                  onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = "#da190b")}
-                                  onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = "#f44336")}
-                                >
-                                  Delete
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -560,17 +350,8 @@ export default function TransactionDetail() {
         )}
 
         {selectedCustomer && isFetched && transactions.length === 0 && (
-          <div
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-              padding: "60px 30px",
-              textAlign: "center",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            }}
-          >
-            <p style={{ color: "#888", fontSize: "16px", margin: 0 }}>
+          <div className="empty-transaction-state">
+            <p className="empty-transaction-text">
               No transactions yet. Add your first transaction above!
             </p>
           </div>

@@ -8,8 +8,9 @@ import RegisterPage from '../RegisterPage/RegisterPage';
 import Dashboard from '../Dashboard/Dashboard.jsx';
 import PrivateRoute from "../Protected/PrivateRoute";
 import CustomerPage from '../Customers/CustomersPage.jsx';
-import AddTransaction from '../Transactions/Addtransaction.jsx';
+import Reports from '../Reports/reports.jsx';
 import TransactionDetail from '../Transactions/TransactionDetail.jsx';
+
 
 function App() {
   const user = useStore((state) => state.user);
@@ -32,9 +33,10 @@ function App() {
           <Route path="/login" element={user?.id ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
           <Route path="/registration" element={user?.id && (user.role === 'admin' || user.role === 'owner') ? <RegisterPage /> : <Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/customers" element={<CustomerPage />} />
-          <Route path="/addtransaction" element={<TransactionDetail />} />
-          <Route path="/about" element={<div className="text-center"><h2>About Page</h2><p>Intelligence doesn’t seem like an aspect of personal character, and it isn’t.</p><p>--From Steve McConnell's <em>Code Complete</em>.</p></div>} />
+          <Route path="/dashboard/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
+          <Route path="/customers" element={<PrivateRoute><CustomerPage /></PrivateRoute>} />
+          <Route path="/addtransaction" element={<PrivateRoute><TransactionDetail /></PrivateRoute>} />
+          <Route path="/about" element={<div className="text-center"><h2>About Page</h2><p>Intelligence doesn't seem like an aspect of personal character, and it isn't.</p><p>--From Steve McConnell's <em>Code Complete</em>.</p></div>} />
           <Route path="*" element={<h2 className="text-center text-danger mt-3">404 Page</h2>} />
         </Routes>
       </main>
@@ -47,4 +49,3 @@ function App() {
 }
 
 export default App;
-

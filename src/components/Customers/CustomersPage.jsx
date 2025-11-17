@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCustomerStore } from "../../zustand/slices/customer.slice";
+import "./CustomersPage.css";
 
 export default function CustomersPage() {
   const customers = useCustomerStore((state) => state.customers);
@@ -7,6 +8,7 @@ export default function CustomersPage() {
   const updateCustomer = useCustomerStore((state) => state.updateCustomer);
   const deleteCustomer = useCustomerStore((state) => state.deleteCustomer);
   const fetchCustomers = useCustomerStore((state) => state.fetchCustomers);
+  const loading = useCustomerStore((state) => state.loading);
 
   // FORM STATES
   const [firstName, setFirstName] = useState("");
@@ -17,11 +19,26 @@ export default function CustomersPage() {
 
   // SEARCH STATES
   const [searchTerm, setSearchTerm] = useState("");
-  const [isFetched, setIsFetched] = useState(false);
+  
+  // PAGINATION STATE
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Fetch customers automatically on component mount
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
 
   // FORM HANDLERS
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log("=== FORM SUBMIT ===");
+    console.log("First Name:", firstName);
+    console.log("Last Name:", lastName);
+    console.log("Phone:", phoneNumber);
+    console.log("Notes:", notes);
+    console.log("Editing ID:", editingCustomerId);
 
     if (!firstName.trim() || !lastName.trim()) {
       alert("Please fill in first and last name");
@@ -29,24 +46,25 @@ export default function CustomersPage() {
     }
 
     const data = {
-      firstname: firstName,
-      lastname: lastName,
-      phone: phoneNumber,
-      notes,
+      firstname: firstName.trim(),
+      lastname: lastName.trim(),
+      phone: phoneNumber.trim(),
+      notes: notes.trim(),
     };
 
     try {
       if (editingCustomerId) {
+        console.log("🔄 Updating customer...");
         await updateCustomer(editingCustomerId, data);
-        alert("Customer updated!");
+        alert("Customer updated successfully!");
       } else {
         await addCustomer(data);
-        alert("Customer added!");
+        alert("Customer added successfully!");
       }
       resetForm();
     } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to save customer. Please try again.");
+      const errorMessage = error.response?.data?.message || error.message || "Unknown error";
+      alert(`Failed to save customer: ${errorMessage}`);
     }
   };
 
@@ -54,16 +72,17 @@ export default function CustomersPage() {
     if (window.confirm("Are you sure you want to delete this customer?")) {
       try {
         await deleteCustomer(id);
-        alert("Customer deleted!");
+        alert("Customer deleted successfully!");
         resetForm();
       } catch (error) {
-        console.error("Error:", error);
-        alert("Failed to delete customer. Please try again.");
+        const errorMessage = error.response?.data?.message || error.message || "Unknown error";
+        alert(`Failed to delete customer: ${errorMessage}`);
       }
     }
   };
 
   const handleEdit = (customer) => {
+    console.log("✏️ Editing customer:", customer);
     setEditingCustomerId(customer.id);
     setFirstName(customer.firstname);
     setLastName(customer.lastname);
@@ -72,17 +91,8 @@ export default function CustomersPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleFetchCustomers = async () => {
-    try {
-      await fetchCustomers();
-      setIsFetched(true);
-    } catch (error) {
-      console.error("Error fetching customers:", error);
-      alert("Failed to fetch customers.");
-    }
-  };
-
   const resetForm = () => {
+    console.log("🔄 Resetting form");
     setEditingCustomerId(null);
     setFirstName("");
     setLastName("");
@@ -102,47 +112,42 @@ export default function CustomersPage() {
     );
   });
 
+  // PAGINATION LOGIC
+  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCustomers = filteredCustomers.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search changes
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f5f5f5", padding: "40px 20px" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+    <div className="customers-page">
+      <div className="customers-page-wrapper">
         {/* PAGE HEADER */}
-        <div style={{ marginBottom: "40px" }}>
-          <h1 style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "10px" }}>
-            Customers
-          </h1>
-          <p style={{ color: "#666", fontSize: "14px" }}>
-            Manage your customer database
-          </p>
+        <div className="customers-header">
+          <h1 className="customers-title">Customers</h1>
+          <p className="customers-subtitle">Manage your customer database</p>
         </div>
 
         {/* ADD CUSTOMER FORM */}
-        <div
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-            border: "1px solid #ddd",
-            padding: "30px",
-            marginBottom: "40px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h2 style={{ textAlign: "center", marginBottom: "25px", color: "#333" }}>
+        <div className="customer-form-card">
+          <h2 className="customer-form-title">
             {editingCustomerId ? "✏️ Edit Customer" : "➕ Add Customer"}
           </h2>
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+          <form onSubmit={handleSubmit} className="customer-form">
             <input
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="First Name"
               required
-              style={{
-                padding: "12px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-                fontSize: "15px",
-              }}
+              disabled={loading}
+              className="customer-input"
             />
             <input
               type="text"
@@ -150,59 +155,33 @@ export default function CustomersPage() {
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Last Name"
               required
-              style={{
-                padding: "12px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-                fontSize: "15px",
-              }}
+              disabled={loading}
+              className="customer-input"
             />
             <input
               type="text"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="Phone Number"
-              style={{
-                padding: "12px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-                fontSize: "15px",
-              }}
+              disabled={loading}
+              className="customer-input"
             />
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Notes"
               rows="3"
-              style={{
-                padding: "12px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-                fontSize: "15px",
-                fontFamily: "inherit",
-                resize: "vertical",
-              }}
+              disabled={loading}
+              className="customer-textarea"
             />
 
-            <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+            <div className="form-button-group">
               <button
                 type="submit"
-                style={{
-                  flex: 1,
-                  padding: "12px",
-                  borderRadius: "8px",
-                  border: "none",
-                  backgroundColor: "#000",
-                  color: "#fff",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.target.style.backgroundColor = "#333")}
-                onMouseLeave={(e) => (e.target.style.backgroundColor = "#000")}
+                disabled={loading}
+                className="form-button form-button-submit"
               >
-                {editingCustomerId ? "Update" : "Add"}
+                {loading ? "Processing..." : (editingCustomerId ? "Update" : "Add")}
               </button>
 
               {editingCustomerId && (
@@ -210,39 +189,16 @@ export default function CustomersPage() {
                   <button
                     type="button"
                     onClick={() => handleDelete(editingCustomerId)}
-                    style={{
-                      flex: 1,
-                      padding: "12px",
-                      borderRadius: "8px",
-                      border: "none",
-                      backgroundColor: "#ff4444",
-                      color: "#fff",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      transition: "all 0.3s",
-                    }}
-                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#cc0000")}
-                    onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff4444")}
+                    disabled={loading}
+                    className="form-button form-button-delete"
                   >
                     Delete
                   </button>
                   <button
                     type="button"
                     onClick={resetForm}
-                    style={{
-                      flex: 1,
-                      padding: "12px",
-                      borderRadius: "8px",
-                      border: "1px solid #ccc",
-                      backgroundColor: "#f5f5f5",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      transition: "all 0.3s",
-                    }}
-                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#e0e0e0")}
-                    onMouseLeave={(e) => (e.target.style.backgroundColor = "#f5f5f5")}
+                    disabled={loading}
+                    className="form-button form-button-cancel"
                   >
                     Cancel
                   </button>
@@ -252,175 +208,111 @@ export default function CustomersPage() {
           </form>
         </div>
 
-        {/* CUSTOMERS LIST SECTION */}
-        <div
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-            border: "1px solid #ddd",
-            padding: "30px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h2 style={{ marginBottom: "20px", color: "#333" }}>
-            👥 All Customers ({customers.length})
+        {/* CUSTOMERS LIST */}
+        <div className="customers-list-card">
+          <h2 className="customers-list-title">
+            👥 All Customers ({filteredCustomers.length})
           </h2>
 
-          {/* FETCH BUTTON */}
-          <button
-            onClick={handleFetchCustomers}
-            style={{
-              padding: "12px 24px",
-              backgroundColor: "#fff",
-              color: "#000",
-              border: "2px solid #000",
-              borderRadius: "8px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              cursor: "pointer",
-              marginBottom: "20px",
-              transition: "all 0.3s",
-            }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#f0f0f0")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#fff")}
-          >
-            Fetch All Customers
-          </button>
+          {/* SEARCH BAR */}
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="🔍 Search customers..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="search-input"
+            />
+            {searchTerm && (
+              <p className="search-results-text">
+                Found {filteredCustomers.length} customer{filteredCustomers.length !== 1 ? "s" : ""}
+              </p>
+            )}
+          </div>
 
-          {/* SEARCH BOX */}
-          {isFetched && (
-            <div style={{ marginBottom: "20px" }}>
-              <input
-                type="text"
-                placeholder="🔍 Search customers..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  borderRadius: "8px",
-                  border: "2px solid #2196F3",
-                  fontSize: "15px",
-                  boxSizing: "border-box",
-                  transition: "border-color 0.3s",
-                }}
-                onFocus={(e) => (e.target.style.borderColor = "#000")}
-                onBlur={(e) => (e.target.style.borderColor = "#2196F3")}
-              />
-              {searchTerm && (
-                <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
-                  Found {filteredCustomers.length} customer{filteredCustomers.length !== 1 ? "s" : ""}
-                </p>
-              )}
+          {/* LOADING STATE */}
+          {loading && (
+            <div className="loading-container">
+              <p className="loading-text">Loading...</p>
             </div>
           )}
 
           {/* CUSTOMERS LIST */}
-          {isFetched ? (
+          {!loading && filteredCustomers.length === 0 ? (
+            <div className="empty-state">
+              <p className="empty-state-text">
+                {searchTerm
+                  ? `No customers found matching "${searchTerm}"`
+                  : "No customers yet. Add your first customer above!"}
+              </p>
+            </div>
+          ) : !loading && (
             <>
-              {filteredCustomers.length === 0 ? (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "40px",
-                    backgroundColor: "#f9f9f9",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <p style={{ color: "#888", fontSize: "16px", margin: 0 }}>
-                    {searchTerm
-                      ? `No customers found matching "${searchTerm}"`
-                      : "No customers yet. Add your first customer above!"}
-                  </p>
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {filteredCustomers.map((customer) => (
-                    <div
-                      key={customer.id}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        padding: "15px",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        backgroundColor: editingCustomerId === customer.id ? "#fff3cd" : "#fff",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      {/* CUSTOMER INFO */}
-                      <div style={{ flex: 1 }}>
-                        <p style={{ margin: "0 0 5px 0", fontSize: "16px", fontWeight: "bold" }}>
-                          {customer.firstname} {customer.lastname}
+              <div className="customers-list">
+                {currentCustomers.map((customer) => (
+                  <div
+                    key={customer.id}
+                    className={`customer-item ${editingCustomerId === customer.id ? "editing" : ""}`}
+                  >
+                    {/* CUSTOMER INFO */}
+                    <div className="customer-info">
+                      <p className="customer-name">
+                        {customer.firstname} {customer.lastname}
+                      </p>
+                      <p className="customer-phone">
+                        📞 {customer.phone || "No phone"}
+                      </p>
+                      {customer.notes && (
+                        <p className="customer-notes">
+                          📝 {customer.notes}
                         </p>
-                        <p style={{ margin: "0 0 5px 0", color: "#666", fontSize: "14px" }}>
-                          📞 {customer.phone || "No phone"}
-                        </p>
-                        {customer.notes && (
-                          <p style={{ margin: "0", fontSize: "13px", color: "#888", fontStyle: "italic" }}>
-                            📝 {customer.notes}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* ACTION BUTTONS */}
-                      <div style={{ display: "flex", gap: "8px", marginLeft: "15px" }}>
-                        <button
-                          onClick={() => handleEdit(customer)}
-                          style={{
-                            padding: "8px 16px",
-                            borderRadius: "6px",
-                            border: "none",
-                            backgroundColor: "#FFC107",
-                            color: "#fff",
-                            cursor: "pointer",
-                            fontWeight: "bold",
-                            fontSize: "14px",
-                            transition: "all 0.3s",
-                          }}
-                          onMouseEnter={(e) => (e.target.style.backgroundColor = "#FFB300")}
-                          onMouseLeave={(e) => (e.target.style.backgroundColor = "#FFC107")}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(customer.id)}
-                          style={{
-                            padding: "8px 16px",
-                            borderRadius: "6px",
-                            border: "none",
-                            backgroundColor: "#f44336",
-                            color: "#fff",
-                            cursor: "pointer",
-                            fontWeight: "bold",
-                            fontSize: "14px",
-                            transition: "all 0.3s",
-                          }}
-                          onMouseEnter={(e) => (e.target.style.backgroundColor = "#da190b")}
-                          onMouseLeave={(e) => (e.target.style.backgroundColor = "#f44336")}
-                        >
-                          Delete
-                        </button>
-                      </div>
+                      )}
                     </div>
-                  ))}
+
+                    {/* ACTION BUTTONS */}
+                    <div className="customer-actions">
+                      <button
+                        onClick={() => handleEdit(customer)}
+                        className="customer-action-button customer-action-edit"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(customer.id)}
+                        className="customer-action-button customer-action-delete"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* PAGINATION CONTROLS */}
+              {totalPages > 1 && (
+                <div className="pagination-container">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="pagination-button"
+                  >
+                    Previous
+                  </button>
+                  
+                  <span className="pagination-info">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="pagination-button"
+                  >
+                    Next
+                  </button>
                 </div>
               )}
             </>
-          ) : (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "40px",
-                backgroundColor: "#f9f9f9",
-                borderRadius: "8px",
-              }}
-            >
-              <p style={{ color: "#888", fontSize: "16px", margin: 0 }}>
-                Click "Fetch All Customers" to load your customers
-              </p>
-            </div>
           )}
         </div>
       </div>

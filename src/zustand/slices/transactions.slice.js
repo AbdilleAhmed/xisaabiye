@@ -4,7 +4,7 @@ import axios from "axios";
 export const useTransactionStore = create((set) => ({
   transactions: [],
   loading: false,
-
+// fetch transactions function
   fetchTransactions: async () => {
     set({ loading: true });
     try {
