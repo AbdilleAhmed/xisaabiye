@@ -27,6 +27,141 @@
   font-size: 14px;
 }
 
+.date-filter-section {
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filter-btn {
+  padding: 10px 20px;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #bbb;
+}
+
+.filter-btn.active {
+  background-color: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.custom-date-range {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.date-input-group {
+  margin-bottom: 15px;
+}
+
+.date-input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.date-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.custom-date-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.apply-filter-btn {
+  padding: 10px 20px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.apply-filter-btn:hover {
+  background-color: #333;
+}
+
+.apply-filter-btn:active {
+  transform: scale(0.98);
+}
+
+.reset-filter-btn {
+  padding: 10px 20px;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.reset-filter-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #bbb;
+}
+
+.active-filter-indicator {
+  background-color: #e3f2fd;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #90caf9;
+}
+
+.active-filter-indicator p {
+  margin: 0;
+  color: #1565c0;
+  font-size: 14px;
+}
+
 .reports-error {
   background-color: #ffebee;
   color: #c62828;
