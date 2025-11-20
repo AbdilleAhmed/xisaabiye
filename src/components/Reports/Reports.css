@@ -1,48 +1,132 @@
+/* Reports Page - Modern & Beautiful Styling */
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* ==================== CONTAINER & LAYOUT ==================== */
 .reports-container {
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 40px 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+  padding: 24px;
 }
 
 .reports-wrapper {
   max-width: 1200px;
   margin: 0 auto;
+  animation: fadeIn 0.5s ease-in;
 }
 
+/* ==================== HEADER ==================== */
 .reports-header {
-  margin-bottom: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  animation: slideDown 0.6s ease-out;
 }
 
 .reports-title {
+  margin: 0 0 8px 0;
+  color: white;
   font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #333;
+  font-weight: 700;
+  letter-spacing: -0.5px;
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
 .reports-subtitle {
-  color: #666;
-  font-size: 14px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 400;
 }
 
+/* ==================== DATE FILTER SECTION ==================== */
 .date-filter-section {
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  padding: 25px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.date-filter-section:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .filter-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #333;
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f3f4f6;
 }
 
+/* ==================== FILTER BUTTONS ==================== */
 .filter-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -52,59 +136,71 @@
 
 .filter-btn {
   padding: 10px 20px;
-  background-color: #fff;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  background: white;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .filter-btn:hover {
-  background-color: #f5f5f5;
-  border-color: #bbb;
+  background: #f9fafb;
+  border-color: #d1d5db;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .filter-btn.active {
-  background-color: #000;
-  color: #fff;
-  border-color: #000;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
+/* ==================== CUSTOM DATE RANGE ==================== */
 .custom-date-range {
-  background-color: #f9f9f9;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
   padding: 20px;
-  border-radius: 8px;
-  margin-top: 15px;
+  border-radius: 12px;
+  margin-top: 16px;
+  border: 2px solid #e5e7eb;
 }
 
 .date-input-group {
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 }
 
 .date-input-group label {
   display: block;
-  margin-bottom: 5px;
-  color: #333;
+  margin-bottom: 8px;
+  color: #374151;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .date-input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background: white;
+  font-family: inherit;
+  box-sizing: border-box;
 }
 
 .date-input:focus {
   outline: none;
-  border-color: #000;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+/* ==================== DATE FILTER ACTIONS ==================== */
 .custom-date-actions {
   display: flex;
   gap: 10px;
@@ -112,112 +208,167 @@
 }
 
 .apply-filter-btn {
-  padding: 10px 20px;
-  background-color: #000;
-  color: #fff;
+  flex: 1;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: bold;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .apply-filter-btn:hover {
-  background-color: #333;
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
 }
 
 .apply-filter-btn:active {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
 .reset-filter-btn {
-  padding: 10px 20px;
-  background-color: #fff;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  flex: 1;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .reset-filter-btn:hover {
-  background-color: #f5f5f5;
-  border-color: #bbb;
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* ==================== ALERT MESSAGES ==================== */
 .active-filter-indicator {
-  background-color: #e3f2fd;
-  padding: 12px 16px;
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  padding: 14px 16px;
+  border-radius: 12px;
   margin-bottom: 20px;
-  border: 1px solid #90caf9;
+  border-left: 4px solid #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+  animation: slideIn 0.3s ease-out;
 }
 
 .active-filter-indicator p {
   margin: 0;
-  color: #1565c0;
+  color: #1e40af;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .reports-error {
-  background-color: #ffebee;
-  color: #c62828;
-  padding: 12px 16px;
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  padding: 14px 16px;
+  border-radius: 12px;
   margin-bottom: 20px;
-  border: 1px solid #ef9a9a;
+  border-left: 4px solid #ef4444;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+  animation: slideIn 0.3s ease-out;
 }
 
+/* ==================== LOADING STATE ==================== */
 .reports-loading {
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+  background: white;
+  border-radius: 16px;
   padding: 60px 30px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .reports-loading-text {
-  color: #888;
+  color: #6b7280;
   font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
 }
 
+.reports-loading-text::after {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(102, 126, 234, 0.3);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ==================== STAT CARDS ==================== */
 .stat-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 25px;
-  margin-bottom: 40px;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
 .stat-card {
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  padding: 30px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s;
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
   cursor: pointer;
+  border: 2px solid transparent;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .stat-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  border-color: #667eea;
+}
+
+.stat-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.stat-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.stat-card:nth-child(3) {
+  animation-delay: 0.3s;
 }
 
 .stat-card-content {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
 }
 
 .stat-card-icon {
-  font-size: 40px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .stat-card-body {
@@ -225,35 +376,50 @@
 }
 
 .stat-card-title {
-  margin: 0 0 10px 0;
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
+  margin: 0 0 8px 0;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .stat-card-value {
   margin: 0;
-  font-size: 28px;
-  font-weight: bold;
+  font-size: 32px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1;
 }
 
+/* ==================== SUMMARY DETAILS SECTION ==================== */
 .summary-details-section {
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  padding: 30px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease-out 0.4s both;
+}
+
+.summary-details-section:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .summary-details-title {
+  margin: 0 0 24px 0;
   font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 25px;
-  color: #333;
+  font-weight: 700;
+  color: #1f2937;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f3f4f6;
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
+/* ==================== DETAILS GRID ==================== */
 .details-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -262,65 +428,148 @@
 
 .detail-card {
   padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  border: 1px solid #eee;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.detail-card:hover {
+  background: white;
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-2px);
 }
 
 .detail-card-label {
-  margin: 0 0 10px 0;
-  color: #666;
+  margin: 0 0 12px 0;
+  color: #6b7280;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
+  gap: 6px;
 }
 
 .detail-card-value {
   margin: 0;
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
 }
 
 .detail-card-value.green {
-  color: #2e7d32;
+  color: #059669;
 }
 
 .detail-card-value.blue {
-  color: #1976d2;
+  color: #2563eb;
 }
 
 .detail-card-value.red {
-  color: #d32f2f;
+  color: #dc2626;
 }
 
+/* ==================== REFRESH BUTTON ==================== */
 .refresh-button-container {
-  margin-top: 30px;
+  margin-top: 32px;
   text-align: center;
+  animation: fadeInUp 0.5s ease-out 0.5s both;
 }
 
 .refresh-button {
-  padding: 12px 24px;
-  background-color: #000;
-  color: #fff;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 15px;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
+  transition: all 0.3s ease;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  margin: 0 auto;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .refresh-button:hover {
-  background-color: #333;
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
 }
 
 .refresh-button:active {
-  transform: scale(0.98);
+  transform: translateY(0);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 768px) {
+  .reports-container {
+    padding: 16px;
+  }
+
+  .reports-header {
+    padding: 24px 20px;
+  }
+
+  .reports-title {
+    font-size: 24px;
+  }
+
+  .reports-subtitle {
+    font-size: 14px;
+  }
+
+  .date-filter-section,
+  .summary-details-section {
+    padding: 20px;
+  }
+
+  .filter-buttons {
+    flex-direction: column;
+  }
+
+  .filter-btn {
+    width: 100%;
+  }
+
+  .custom-date-actions {
+    flex-direction: column;
+  }
+
+  .apply-filter-btn,
+  .reset-filter-btn {
+    width: 100%;
+  }
+
+  .stat-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card-value {
+    font-size: 28px;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-card-value {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reports-header {
+    border-radius: 16px;
+  }
+
+  .date-filter-section,
+  .summary-details-section {
+    border-radius: 12px;
+  }
 }

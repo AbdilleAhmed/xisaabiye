@@ -1,6 +1,23 @@
 import { useState, useEffect } from "react";
 import { useCustomerStore } from "../../zustand/slices/customer.slice";
 import { useTransactionStore } from "../../zustand/slices/transactions.slice";
+import { 
+  Search, 
+  TrendingUp, 
+  TrendingDown, 
+  Wallet,
+  Users,
+  Plus,
+  Edit2,
+  Trash2,
+  Save,
+  X,
+  DollarSign,
+  AlertCircle,
+  CheckCircle,
+  Phone,
+  User
+} from "lucide-react";
 import "./TransactionDetail.css";
 
 export default function TransactionDetail() {
@@ -19,6 +36,17 @@ export default function TransactionDetail() {
   const [editingTransactionId, setEditingTransactionId] = useState(null);
   const [editedAmount, setEditedAmount] = useState("");
   const [editedType, setEditedType] = useState("credit");
+
+  // Calculate current balance from transactions
+  const calculateBalance = () => {
+    if (!transactions || transactions.length === 0) return 0;
+    const sortedTransactions = [...transactions].sort((a, b) => 
+      new Date(b.created_at) - new Date(a.created_at)
+    );
+    return sortedTransactions[0]?.balance_after || 0;
+  };
+
+  const currentBalance = calculateBalance();
 
   useEffect(() => {
     fetchCustomers();
@@ -51,8 +79,6 @@ export default function TransactionDetail() {
         transaction_type: transactionType,
       };
 
-      console.log("Adding transaction:", transactionData);
-
       await addTransaction(transactionData);
       showMessage("Transaction added successfully!", "success");
       setAmount("");
@@ -70,7 +96,6 @@ export default function TransactionDetail() {
     if (window.confirm("Are you sure you want to delete this transaction?")) {
       setLoading(true);
       try {
-        console.log("Deleting transaction:", id);
         await deleteTransaction(id);
         showMessage("Transaction deleted successfully!", "success");
         await fetchTransactionsByCustomer(selectedCustomer);
@@ -102,8 +127,6 @@ export default function TransactionDetail() {
         transaction_type: editedType,
       };
 
-      console.log("Updating transaction:", id, updateData);
-
       await updateTransaction(id, updateData);
       setEditingTransactionId(null);
       showMessage("Transaction updated successfully!", "success");
@@ -130,7 +153,6 @@ export default function TransactionDetail() {
     if (customerId) {
       setLoading(true);
       try {
-        console.log("Fetching transactions for customer:", customerId);
         await fetchTransactionsByCustomer(customerId);
         setIsFetched(true);
       } catch (err) {
@@ -152,115 +174,198 @@ export default function TransactionDetail() {
     );
   });
 
+  // Get first 5 customers to display by default
+  const displayCustomers = searchTerm ? filteredCustomers : filteredCustomers.slice(0, 5);
   const selectedCustomerData = customers.find((c) => c.id == selectedCustomer);
 
   return (
     <div className="transaction-detail-container">
       <div className="transaction-detail-wrapper">
+        {/* Header */}
         <div className="transaction-detail-header">
-          <h1 className="transaction-detail-title">Transactions</h1>
-          <p className="transaction-detail-subtitle">Manage customer transactions</p>
+          <div className="header-content">
+            <div className="header-icon">
+              <Wallet size={40} strokeWidth={2} />
+            </div>
+            <div>
+              <h1 className="transaction-detail-title">Transaction Manager</h1>
+              <p className="transaction-detail-subtitle">Track customer payments and purchases</p>
+            </div>
+          </div>
         </div>
 
+        {/* Alert Messages */}
         {message && (
           <div className={`message-alert ${messageType}`}>
-            {message}
+            {messageType === "success" ? (
+              <CheckCircle size={20} />
+            ) : (
+              <AlertCircle size={20} />
+            )}
+            <span>{message}</span>
           </div>
         )}
 
         <div className="transaction-grid">
-          <div className="card">
-            <h2 className="card-title">Search Customer</h2>
+          {/* Customer Selection Card */}
+          <div className="card customer-card">
+            <div className="card-header">
+              <Users size={24} />
+              <h2 className="card-title">Select Customer</h2>
+            </div>
 
-            <input
-              type="text"
-              placeholder="Search by name or phone..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
+            <div className="search-wrapper">
+              <Search size={18} className="search-icon" />
+              <input
+                type="text"
+                placeholder="Search by name or phone..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+            </div>
 
             <div className="customer-list">
-              {filteredCustomers.length === 0 ? (
-                <p className="customer-list-empty">No customers found</p>
+              {displayCustomers.length === 0 ? (
+                <div className="customer-list-empty">
+                  <Users size={40} className="empty-icon" />
+                  <p>No customers found</p>
+                </div>
               ) : (
-                filteredCustomers.map((customer) => (
-                  <div
-                    key={customer.id}
-                    onClick={() => handleSelectCustomer(customer.id)}
-                    className={`customer-item ${selectedCustomer == customer.id ? "selected" : ""}`}
-                  >
-                    <p className="customer-name">
-                      {customer.firstname} {customer.lastname}
-                    </p>
-                    <p className="customer-phone">{customer.phone || "No phone"}</p>
-                  </div>
-                ))
+                <>
+                  {displayCustomers.map((customer) => (
+                    <div
+                      key={customer.id}
+                      onClick={() => handleSelectCustomer(customer.id)}
+                      className={`customer-item ${selectedCustomer == customer.id ? "selected" : ""}`}
+                    >
+                      <div className="customer-avatar">
+                        <User size={20} />
+                      </div>
+                      <div className="customer-details">
+                        <p className="customer-name">
+                          {customer.firstname} {customer.lastname}
+                        </p>
+                        <p className="customer-phone">
+                          <Phone size={12} />
+                          {customer.phone || "No phone"}
+                        </p>
+                      </div>
+                      {selectedCustomer == customer.id && (
+                        <CheckCircle size={18} className="selected-icon" />
+                      )}
+                    </div>
+                  ))}
+                  {!searchTerm && filteredCustomers.length > 5 && (
+                    <div className="customer-count-info">
+                    total customers {filteredCustomers.length} 
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
 
-          <div className="card">
-            <h2 className="card-title">
-              {selectedCustomer ? "Add Transaction" : "Select a Customer"}
-            </h2>
-
-            {selectedCustomer && (
-              <div className="customer-info-box">
-                <p className="customer-info-text">
-                  <strong>Customer:</strong> {selectedCustomerData?.firstname} {selectedCustomerData?.lastname}
-                </p>
-              </div>
-            )}
+          {/* Transaction Form Card */}
+          <div className="card transaction-card">
+            <div className="card-header">
+              <DollarSign size={24} />
+              <h2 className="card-title">
+                {selectedCustomer ? "New Transaction" : "Select a Customer"}
+              </h2>
+            </div>
 
             {selectedCustomer ? (
-              <form onSubmit={handleAddTransaction} className="transaction-form">
-                <div className="form-group">
-                  <label className="form-label">Type:</label>
-                  <select
-                    value={transactionType}
-                    onChange={(e) => setTransactionType(e.target.value)}
-                    className="form-select"
+              <>
+                {/* Customer Info */}
+                <div className="customer-info-box">
+                  <User size={16} />
+                  <span>
+                    <strong>{selectedCustomerData?.firstname} {selectedCustomerData?.lastname}</strong>
+                  </span>
+                </div>
+
+                {/* Balance Display */}
+                <div className={`balance-display ${currentBalance >= 0 ? 'balance-positive' : 'balance-negative'}`}>
+                  <div className="balance-icon">
+                    <Wallet size={28} />
+                  </div>
+                  <div className="balance-info">
+                    <div className="balance-label">Current Balance</div>
+                    <div className="balance-amount">
+                      ${Math.abs(currentBalance).toFixed(2)}
+                      {currentBalance < 0 && <span className="balance-status">Owes</span>}
+                    </div>
+                  </div>
+                </div>
+
+               
+
+                {/* Transaction Form */}
+                <form onSubmit={handleAddTransaction} className="transaction-form">
+                  <div className="form-group">
+                    <label className="form-label">Transaction Type</label>
+                    <div className="select-wrapper">
+                      {transactionType === "credit" ? (
+                        <TrendingUp size={16} className="select-icon icon-credit" />
+                      ) : (
+                        <TrendingDown size={16} className="select-icon icon-debit" />
+                      )}
+                      <select
+                        value={transactionType}
+                        onChange={(e) => setTransactionType(e.target.value)}
+                        className="form-select"
+                      >
+                        <option value="credit">Credit - Payment Received</option>
+                        <option value="debit">Debit - Purchase/Owe</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Amount</label>
+                    <div className="input-wrapper">
+                      <DollarSign size={16} className="input-icon" />
+                      <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="0.00"
+                        min="0.01"
+                        step="0.01"
+                        className="form-input"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn btn-primary"
                   >
-                    <option value="credit">Credit</option>
-                    <option value="debit">Debit</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Amount:</label>
-                  <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount"
-                    min="0.01"
-                    step="0.01"
-                    className="form-input"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="btn btn-primary"
-                >
-                  {loading ? "Adding..." : "Add Transaction"}
-                </button>
-              </form>
+                    <Plus size={18} />
+                    {loading ? "Adding..." : "Add Transaction"}
+                  </button>
+                </form>
+              </>
             ) : (
-              <p className="empty-state">
-                Select a customer from the list to add a transaction
-              </p>
+              <div className="empty-state">
+                <Users size={48} className="empty-icon" />
+                <p>Select a customer from the list to get started</p>
+              </div>
             )}
           </div>
         </div>
 
+        {/* Transaction History */}
         {selectedCustomer && isFetched && transactions.length > 0 && (
-          <div className="card">
-            <h2 className="card-title">
-              Transactions for {selectedCustomerData?.firstname} {selectedCustomerData?.lastname}
-            </h2>
+          <div className="card transaction-history-card">
+            <div className="card-header">
+              <Wallet size={24} />
+              <h2 className="card-title">
+                Transaction History - {selectedCustomerData?.firstname} {selectedCustomerData?.lastname}
+              </h2>
+            </div>
 
             <div className="transaction-table-wrapper">
               <table className="transaction-table">
@@ -268,6 +373,7 @@ export default function TransactionDetail() {
                   <tr>
                     <th>Type</th>
                     <th>Amount</th>
+                    <th>Balance After</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -285,7 +391,14 @@ export default function TransactionDetail() {
                             <option value="debit">Debit</option>
                           </select>
                         ) : (
-                          <span className="transaction-type">{t.transaction_type}</span>
+                          <span className={`transaction-type-badge ${t.transaction_type}`}>
+                            {t.transaction_type === "credit" ? (
+                              <TrendingUp size={14} />
+                            ) : (
+                              <TrendingDown size={14} />
+                            )}
+                            {t.transaction_type}
+                          </span>
                         )}
                       </td>
                       <td>
@@ -299,8 +412,20 @@ export default function TransactionDetail() {
                             className="table-input"
                           />
                         ) : (
-                          <span className="transaction-amount">${t.amount.toFixed(2)}</span>
+                          <span className="transaction-amount">
+                            <DollarSign size={14} />
+                            {t.amount.toFixed(2)}
+                          </span>
                         )}
+                      </td>
+                      <td>
+                        <span className={`balance-after ${t.balance_after >= 0 ? 'positive' : 'negative'}`}>
+                          <DollarSign size={14} />
+                          {Math.abs(t.balance_after).toFixed(2)}
+                          {t.balance_after < 0 && (
+                            <span className="owes-badge">Owes</span>
+                          )}
+                        </span>
                       </td>
                       <td>
                         <div className="action-buttons">
@@ -309,16 +434,18 @@ export default function TransactionDetail() {
                               <button
                                 onClick={() => handleUpdate(t.id)}
                                 disabled={loading}
-                                className="btn btn-success"
+                                className="btn btn-success btn-icon"
+                                title="Save"
                               >
-                                Save
+                                <Save size={16} />
                               </button>
                               <button
                                 onClick={handleCancelEdit}
                                 disabled={loading}
-                                className="btn btn-secondary"
+                                className="btn btn-secondary btn-icon"
+                                title="Cancel"
                               >
-                                Cancel
+                                <X size={16} />
                               </button>
                             </>
                           ) : (
@@ -326,16 +453,18 @@ export default function TransactionDetail() {
                               <button
                                 onClick={() => handleEdit(t)}
                                 disabled={loading}
-                                className="btn btn-warning"
+                                className="btn btn-warning btn-icon"
+                                title="Edit"
                               >
-                                Edit
+                                <Edit2 size={16} />
                               </button>
                               <button
                                 onClick={() => handleDelete(t.id)}
                                 disabled={loading}
-                                className="btn btn-danger"
+                                className="btn btn-danger btn-icon"
+                                title="Delete"
                               >
-                                Delete
+                                <Trash2 size={16} />
                               </button>
                             </>
                           )}
@@ -350,10 +479,12 @@ export default function TransactionDetail() {
         )}
 
         {selectedCustomer && isFetched && transactions.length === 0 && (
-          <div className="empty-transaction-state">
-            <p className="empty-transaction-text">
-              No transactions yet. Add your first transaction above!
-            </p>
+          <div className="card empty-transaction-card">
+            <div className="empty-transaction-state">
+              <Wallet size={64} className="empty-icon" />
+              <h3>No transactions yet</h3>
+              <p>Add the first transaction for this customer above!</p>
+            </div>
           </div>
         )}
       </div>

@@ -1,25 +1,30 @@
-const express = require('express');
-const pool = require('../modules/pool');
-const {rejectUnauthenticated,rejectIfNotAdmin} = require ("../modules/authentication-middleware");
-
-
-
+const express = require("express");
+const pool = require("../modules/pool");
+const {
+  rejectUnauthenticated,
+  rejectIfNotAdmin,
+} = require("../modules/authentication-middleware");
 const router = express.Router();
 
-
-router.get('/', rejectUnauthenticated, async (req, res) => {
+// get all customers route (both user and admin)
+router.get("/", rejectUnauthenticated, async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM customers ORDER BY id DESC;');
+    const result = await pool.query(
+      "SELECT * FROM customers ORDER BY id DESC;"
+    );
     res.json(result.rows);
   } catch (err) {
-    console.error('Error getting customers:', err.message);
-    res.status(500).json({ error: 'Failed to fetch customers' });
+    console.error("Error getting customers:", err.message);
+    res.status(500).json({ error: "Failed to fetch customers" });
   }
 });
+
+// serach route for both admin and staff
 router.get("/search", rejectUnauthenticated, async (req, res) => {
   const { query } = req.query;
 
   try {
+    // query validations
     if (!query || query.trim() === "") {
       return res.status(400).json({ error: "Search query is required" });
     }
@@ -42,24 +47,32 @@ router.get("/search", rejectUnauthenticated, async (req, res) => {
   }
 });
 
-router.get('/:id', rejectUnauthenticated, async (req, res) => {
+// get single user
+router.get("/:id", rejectUnauthenticated, async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM customers WHERE id = $1;', [req.params.id]);
+    const result = await pool.query("SELECT * FROM customers WHERE id = $1;", [
+      req.params.id,
+    ]);
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Customer not found' });
+      return res.status(404).json({ error: "Customer not found" });
     }
     res.json(result.rows[0]);
   } catch (err) {
-    console.error('Error getting customer:', err.message);
-    res.status(500).json({ error: 'Failed to fetch customer' });
+    console.error("Error getting customer:", err.message);
+    res.status(500).json({ error: "Failed to fetch customer" });
   }
 });
 
-router.post('/', rejectUnauthenticated, rejectIfNotAdmin, async (req, res) => {
+// pst route
+// adding new customer (only for admin )
+// reject if not admin middleware used
+router.post("/", rejectUnauthenticated, rejectIfNotAdmin, async (req, res) => {
   const { firstname, lastname, phone, notes } = req.body;
 
   if (!firstname || !lastname) {
-    return res.status(400).json({ error: 'Firstname and lastname are required' });
+    return res
+      .status(400)
+      .json({ error: "Firstname and lastname are required" });
   }
 
   try {
@@ -71,51 +84,65 @@ router.post('/', rejectUnauthenticated, rejectIfNotAdmin, async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error('Error adding customer:', err.message);
-    res.status(500).json({ error: 'Failed to add customer' });
+    console.error("Error adding customer:", err.message);
+    res.status(500).json({ error: "Failed to add customer" });
   }
 });
 
-router.put('/:id', rejectUnauthenticated, rejectIfNotAdmin, async (req, res) => {
-  const { firstname, lastname, phone, notes } = req.body;
+// put route (only for admin)
+router.put(
+  "/:id",
+  rejectUnauthenticated,
+  rejectIfNotAdmin,
+  async (req, res) => {
+    const { firstname, lastname, phone, notes } = req.body;
 
-  if (!firstname || !lastname) {
-    return res.status(400).json({ error: 'Firstname and lastname are required' });
-  }
+    if (!firstname || !lastname) {
+      return res
+        .status(400)
+        .json({ error: "Firstname and lastname are required" });
+    }
 
-  try {
-    const result = await pool.query(
-      `UPDATE customers
+    try {
+      const result = await pool.query(
+        `UPDATE customers
        SET firstname = $1, lastname = $2, phone = $3, notes = $4, updated_at = NOW()
        WHERE id = $5
        RETURNING *;`,
-      [firstname, lastname, phone, notes, req.params.id]
-    );
+        [firstname, lastname, phone, notes, req.params.id]
+      );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Customer not found' });
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Customer not found" });
+      }
+
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error("Error updating customer:", err.message);
+      res.status(500).json({ error: "Failed to update customer" });
     }
-
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error('Error updating customer:', err.message);
-    res.status(500).json({ error: 'Failed to update customer' });
   }
-});
+);
 
-router.delete('/:id', rejectUnauthenticated, rejectIfNotAdmin, async (req, res) => {
-  try {
-    const result = await pool.query('DELETE FROM customers WHERE id = $1;', [req.params.id]);
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Customer not found' });
+// delete route (only for admin)
+router.delete(
+  "/:id",
+  rejectUnauthenticated,
+  rejectIfNotAdmin,
+  async (req, res) => {
+    try {
+      const result = await pool.query("DELETE FROM customers WHERE id = $1;", [
+        req.params.id,
+      ]);
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: "Customer not found" });
+      }
+      res.sendStatus(204);
+    } catch (err) {
+      console.error("Error deleting customer:", err.message);
+      res.status(500).json({ error: "Failed to delete customer" });
     }
-    res.sendStatus(204);
-  } catch (err) {
-    console.error('Error deleting customer:', err.message);
-    res.status(500).json({ error: 'Failed to delete customer' });
   }
-});
-
-
+);
 
 module.exports = router;

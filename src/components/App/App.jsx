@@ -23,7 +23,7 @@ function App() {
   return (
     <div className="d-flex flex-column min-vh-100">
       <header className="d-flex flex-column align-items-center justify-content-center py-4 bg-light">
-        <h1>Xisabiye Credit Calculator</h1>
+        <h1>Xisaabiye Credit Calculator</h1>
         <Nav />
       </header>
 

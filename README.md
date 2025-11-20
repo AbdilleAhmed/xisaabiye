@@ -23,6 +23,7 @@ Create a new database, then create a `user` table using the query found in `data
     ```plaintext
       SERVER_SESSION_SECRET=superDuperSecret
     ```
+    B9B67nfvuG7U8QUdn1gbib0Q
 - While you're in your new `.env` file, take the time to replace `superDuperSecret` with some a random string like `25POUbVtx6RKVNWszd9ERB9Bb6` to keep your application secure. 
     - Here's a site that can help you: [Password Generator Plus](https://passwordsgenerator.net).
     - If you skip this step, create a secret with less than eight characters, or leave it as `superDuperSecret`, you'll get a big warning message each time you start your server.

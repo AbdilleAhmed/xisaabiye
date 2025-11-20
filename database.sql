@@ -15,6 +15,30 @@ CREATE TABLE "user" (
   "inserted_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
   "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-------------------------------------------------------
+-- CUSTOMERS TABLE
+-------------------------------------------------------
+CREATE TABLE customers (
+  id SERIAL PRIMARY KEY,
+  firstname VARCHAR(100) NOT NULL,
+  lastname VARCHAR(100) NOT NULL,
+  phone VARCHAR(20),
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE transactions (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  customer_id INT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  transaction_type VARCHAR(10) NOT NULL DEFAULT 'credit' CHECK (transaction_type IN ('credit', 'debit')),
+  total_amount NUMERIC(10,2) NOT NULL,
+  amount_paid NUMERIC(10,2) DEFAULT 0.00,
+  balance_after NUMERIC(10,2) GENERATED ALWAYS AS (total_amount - amount_paid) STORED,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
 
 -------------------------------------------------------
